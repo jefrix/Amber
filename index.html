@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Amber</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Nunito:wght@600;800&display=swap">
+<style>
+/* Layout: her name glowing like a piece of amber held up to the light, with her shelf of things below. */
+:root{
+  color-scheme:dark;
+  --pine:#0d2e2c; --pine2:#164440; --honey:#ffb52e; --ember:#e8701a; --pale:#fff0c9; --mist:#a9cfc4;
+  --display:"Gloock",Georgia,"Times New Roman",serif;
+  --body:"Nunito",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;min-height:100dvh;background:radial-gradient(90vmax 60vmax at 50% 0,var(--pine2),var(--pine));color:var(--pale);font-family:var(--body);font-weight:600;
+  display:flex;flex-direction:column;align-items:center;gap:clamp(28px,6vh,56px);
+  padding-block:clamp(36px,9vh,90px) 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{margin:0;font:400 clamp(84px,27vw,250px)/.95 var(--display);text-align:center;letter-spacing:-.01em;
+  color:var(--honey);background:linear-gradient(115deg,#ffd36b 8%,var(--honey) 38%,var(--ember) 62%,#ffc548 90%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 34px #ffb52e66)}
+section{width:min(100%,760px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),380px));justify-content:center;gap:20px}
+h2{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.thing{display:flex;flex-direction:column;background:var(--honey);color:#3a1c00;text-decoration:none;border-radius:18px;overflow:hidden;box-shadow:0 7px 0 #a94f0c;transition:transform .12s,box-shadow .12s}
+.thing:hover{transform:translateY(-3px);box-shadow:0 10px 0 #a94f0c}
+.thing:active{transform:translateY(5px);box-shadow:0 2px 0 #a94f0c}
+.thing:focus-visible{outline:4px solid var(--pale);outline-offset:4px}
+.thing img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}
+.thing span{display:block;padding:14px 18px 16px;font:800 clamp(24px,5vw,30px)/1.1 var(--body);text-align:center}
+@media (prefers-reduced-motion:reduce){.thing{transition:none}}
+</style>
+</head>
+<body>
+<h1>Amber</h1>
+<section aria-labelledby="shelf">
+  <h2 id="shelf">Amber's games</h2>
+  <!-- To add a game or program: copy this link and point it at the new folder. -->
+  <a class="thing" href="games/hullabaloo/"><img src="games/hullabaloo/preview.jpg" alt="A little hero running along a bridge that spirals around a tall tower"><span>Play Hullabaloo!</span></a>
+</section>
+</body>
+</html>
