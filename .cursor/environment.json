@@ -1,0 +1,11 @@
+{
+  "name": "Amber",
+  "install": "bash .cursor/install.sh",
+  "start": "bash .cursor/start.sh",
+  "ports": [
+    {
+      "name": "Amber",
+      "port": 8000
+    }
+  ]
+}
