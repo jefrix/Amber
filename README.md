@@ -10,3 +10,4 @@ Amber's own games and programs. `index.html` is her home page.
 ## What's here
 
 - `games/hullabaloo/`: a 2.5D platformer inspired by *Pandemonium!* (1996), with its own story, characters and levels.
+- `games/bloodroot-episode-1/`: a choice-driven mystery, Episode 1 of Bloodroot. Open `index.html` in a browser — no build step.

@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090807">
+<meta name="description" content="Bloodroot, Episode 1: a playable Telltale-style mystery. You are Amber. The flower remembers.">
+<title>Bloodroot — Episode 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,520;0,9..144,680;1,9..144,560&family=Outfit:wght@400;500;700&display=swap">
+<style>
+/* Layout: a cinematic scene above a narration-and-choices dock, in the shape of a Telltale episode. */
+:root{
+  color-scheme:dark;
+  --ink:#090807; --bark:#14110e; --panel:#1b1612; --line:#4a3f32; --cream:#f6efe4; --mist:#cbbfa8;
+  --lamp:#e7a64a; --ember:#c4621a; --bruise:#cbb6ee; --moss:#243028; --rust:#c45a45;
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+  --ui:"Outfit",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{margin:0; overflow-anchor:none}
+body{
+  min-height:100dvh; background:
+    radial-gradient(90vmax 42vmax at 50% -12%, #2c2418 0%, transparent 58%),
+    var(--ink);
+  color:var(--cream); font-family:var(--ui); font-weight:400;
+  padding:clamp(16px,3vw,28px) max(16px,env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+}
+button{font:inherit; color:inherit; cursor:pointer}
+:focus-visible{outline:3px solid var(--lamp); outline-offset:3px}
+.shell{width:min(980px,100%); margin:0 auto; display:flex; flex-direction:column; gap:14px}
+@media (min-width:860px) and (min-height:720px){
+  .shell{width:min(980px, calc((100dvh - 300px) * 16 / 9))}
+}
+header{display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap}
+.home{color:var(--mist); text-decoration:none; font-size:13px; letter-spacing:.08em; text-transform:uppercase}
+.home:hover{color:var(--cream)}
+.brand{margin:4px 0 0; color:var(--lamp); letter-spacing:.2em; text-transform:uppercase; font-size:12px; font-weight:500}
+.shell.is-title #title,.shell.is-title #sub{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%)}
+h1{margin:2px 0 0; font:520 clamp(28px,5vw,46px)/1.05 var(--display); text-wrap:balance}
+.sub{margin:4px 0 0; color:var(--mist); font-size:13px}
+#restart{
+  background:transparent; border:1px solid var(--line); color:var(--cream);
+  border-radius:999px; padding:8px 14px; font-weight:500;
+}
+#restart:hover{border-color:var(--lamp)}
+.flags{display:flex; flex-wrap:wrap; gap:8px}
+.flags:empty{display:none}
+.flag{
+  color:var(--bruise); background:#2a2038; border:1px solid #6d5a88;
+  border-radius:999px; padding:4px 10px; font-size:13px; font-weight:500;
+}
+.notice{
+  display:flex; flex-wrap:wrap; gap:8px 12px; align-items:baseline;
+  border:1px solid #d7b15a66; background:linear-gradient(90deg,#3a2a12,#1a140e);
+  color:#f0d48a; border-radius:10px; padding:10px 14px;
+}
+.notice b{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--lamp); font-weight:700}
+.frame{
+  position:relative; border-radius:12px; overflow:hidden;
+  border:1px solid #3a3228; background:#0c0a08;
+  box-shadow:0 18px 50px #000a;
+  width:min(100%, calc(min(50vh, 520px) * 16 / 9));
+}
+.frame img{display:block; width:100%; height:auto}
+.vignette{
+  position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse at center, transparent 52%, #00000073 100%);
+}
+.hero-copy{
+  position:absolute; left:0; right:0; bottom:0; padding:22px 22px 18px;
+  background:linear-gradient(transparent, #090807e6 70%);
+  pointer-events:none;
+}
+.eyebrow{margin:0; letter-spacing:.18em; text-transform:uppercase; font-size:12px; color:var(--lamp); font-weight:500}
+.hero-copy h2{margin:4px 0 0; font:680 clamp(48px,9vw,84px)/.9 var(--display); font-style:italic}
+.episode{margin:6px 0 0; font:560 clamp(16px,2.4vw,22px)/1.3 var(--display)}
+.episode span{color:var(--mist)}
+.caption{margin:-6px 2px 0; color:var(--mist); font-size:13px}
+.hot{
+  position:absolute; margin:0; padding:0;
+  background:rgba(231,166,74,.12);
+  border:2px solid rgba(244,224,180,.92);
+  border-radius:6px;
+  box-shadow:0 0 0 1px #0008;
+  animation:pulse 2.6s ease-in-out infinite;
+}
+.hot .tag{
+  position:absolute; left:4px; top:4px; pointer-events:none;
+  font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  background:#120e0ce6; color:var(--cream); border-radius:4px; padding:2px 6px;
+  white-space:nowrap;
+}
+.hot:hover,.hot:focus-visible{background:rgba(176,140,230,.28); border-color:#e6d6ff}
+.hot[aria-pressed="true"]{background:rgba(176,140,230,.34); border-color:#e6d6ff; animation:none}
+@keyframes pulse{50%{box-shadow:0 0 0 1px #0008, 0 0 18px rgba(231,166,74,.55)}}
+#stage{display:flex; flex-direction:column; align-items:center}
+.caption{width:100%}
+.inspect{
+  background:#221c2c; border:1px solid #6d5a88; border-radius:12px; padding:14px 16px;
+}
+.inspect .kicker{margin:0; color:var(--bruise); letter-spacing:.14em; text-transform:uppercase; font-size:11px; font-weight:700}
+.inspect h2{margin:4px 0 6px; font:560 22px/1.2 var(--display)}
+.inspect p{margin:0; color:var(--cream); line-height:1.45}
+.inspect button{
+  margin-top:10px; background:transparent; border:1px solid #6d5a88; color:var(--cream);
+  border-radius:999px; padding:6px 12px; font-weight:500;
+}
+#narration{
+  margin:0; white-space:pre-wrap;
+  font:560 clamp(17px,2.05vw,20px)/1.55 var(--display);
+  background:var(--bark); border:1px solid #3a3228; border-radius:12px; padding:18px 20px;
+}
+#narration:empty{display:none}
+.epilogue{border-radius:12px; padding:14px 16px; border:1px solid}
+.epilogue.complete{background:#1c2418; border-color:#6d8a55; color:#e4f0d4}
+.epilogue.short{background:#2a1612; border-color:#a85a48; color:#f6ddd6}
+.epilogue b{display:block; margin-bottom:4px; letter-spacing:.14em; text-transform:uppercase; font-size:11px; font-weight:700}
+.prompt{margin:2px 0 0; color:var(--mist); font-size:13px; letter-spacing:.12em; text-transform:uppercase; font-weight:500}
+.choices{display:flex; flex-direction:column; gap:8px}
+.choice{
+  display:flex; gap:12px; align-items:baseline; text-align:left; width:100%;
+  background:var(--panel); border:1px solid var(--line); border-radius:10px;
+  padding:13px 16px; min-height:52px; color:var(--cream); font-weight:500; font-size:16px; line-height:1.35;
+}
+.choice .n{color:var(--lamp); font-weight:700; min-width:1.1em; font-variant-numeric:tabular-nums}
+.choice:hover{border-color:var(--lamp); background:#262017}
+.choice.lead{
+  background:linear-gradient(90deg,#6a3a16,#3a2414);
+  border-color:var(--lamp); box-shadow:0 5px 0 #4a250c;
+}
+.choice.lead:hover{filter:brightness(1.06)}
+.choice.lead:active{transform:translateY(4px); box-shadow:0 1px 0 #4a250c}
+.foot{margin:0; color:#8d8172; font-size:13px; line-height:1.45}
+.missing{padding:28px; color:var(--mist)}
+@media (prefers-reduced-motion:reduce){
+  .hot{animation:none}
+  .choice.lead:active{transform:none}
+}
+@media (max-width:640px){
+  .choice{font-size:15px}
+  .hot .tag{font-size:10px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div>
+      <a class="home" href="../../">← Amber</a>
+      <p class="brand">Bloodroot · Episode 1</p>
+      <h1 id="title" tabindex="-1">Bloodroot</h1>
+      <p class="sub" id="sub"></p>
+    </div>
+    <button type="button" id="restart" hidden>Restart</button>
+  </header>
+  <div id="flags" class="flags"></div>
+  <div id="notice" class="notice" hidden></div>
+  <div id="stage"></div>
+  <div id="inspect"></div>
+  <article id="narration" aria-live="polite"></article>
+  <div id="epilogue"></div>
+  <div id="choices" class="choices"></div>
+  <p id="foot" class="foot"></p>
+</div>
+<noscript><p style="text-align:center">This episode needs JavaScript.</p></noscript>
+<script>
+"use strict";
+const IMGS = {
+  s1: "scene01.jpg",
+  s2: "scene02.jpg",
+  s3: "scene03.jpg",
+  s4: "scene04.jpg",
+  s5: "scene05.jpg",
+  s6: "scene06.jpg",
+  s7: "scene07.jpg",
+  s8: "scene08-greenhouse.jpg",
+};
+
+const START_FLAGS = {
+  angieRememberLie: false,
+  angieSawNote: false,
+  ruthTrusts: false,
+  kennySafe: false,
+  gaveFlowerToRuth: false,
+};
+
+const FLAG_LABELS = [
+  ["angieRememberLie", "Angie remembers your lie"],
+  ["angieSawNote", "Angie saw Dad's note"],
+  ["ruthTrusts", "Ruth trusts you"],
+  ["kennySafe", "Kenny is with you"],
+  ["gaveFlowerToRuth", "Ruth opened the door"],
+];
+
+/* Hotspot rectangles are percentages of the scene art, lined up with the objects in each painting. */
+const SCENES = {
+  title: {
+    id: "title",
+    title: "Bloodroot — Episode 1",
+    narration:
+      "A Telltale-style mystery on a dark Virginia mountain near Lynchburg. You are Amber, a landscape architect who classifies flowers in the basement. Upstairs: Kenny, Koty, and Mom Angie. Your choices shape who trusts you.",
+    choices: [{ label: "Begin Episode 1: The Late Shipment", next: "s1" }],
+  },
+  s1: {
+    id: "s1",
+    title: "The Late Shipment",
+    img: "s1",
+    narration:
+      "Rain needles the basement window. 9:40 PM. A late Verdance Group box: dry ice, handwritten slip for Hollins Ridge Farm — a place that burned before Amber was born. Inside: one bruise-purple flower with silver veins. It is in no catalog.\n\nUpstairs Koty's music thumps. Mom: \"Kenny, I told you not to go up there after dark.\"\n\nTablet from Dr. Pell: \"Did a package arrive? Do not open it. Do not log it.\"\n\nThe flower turns toward Amber's face.",
+    hotspots: [
+      { id: "flower", label: "Flower", x: 31, y: 43, w: 16, h: 16, title: "Impossible bloom", body: "Five bruise-purple petals. Silver veins that pulse. The center shifts when she leans close." },
+      { id: "tablet", label: "Tablet", x: 28, y: 5, w: 16, h: 13, title: "Dr. Pell", body: "\"Do not open it. Do not log it. I'll send someone in the morning.\"" },
+      { id: "slip", label: "Slip", x: 44, y: 75, w: 30, h: 18, title: "Packing slip", body: "Hollins Ridge Farm, Rt. 2. The farm burned decades ago." },
+    ],
+    choices: [
+      { label: "Tell Dr. Pell the truth: it's already open", next: "s2", notice: "Pell knows you answered." },
+      { label: "Lie: say the box hasn't been opened", next: "s1_lie" },
+      { label: "Ignore Pell and put the flower in the cold case", next: "s1_cold" },
+    ],
+  },
+  s1_lie: {
+    id: "s1_lie",
+    title: "A Careful Lie",
+    img: "s1",
+    narration:
+      "\"Box arrived. Still sealed.\" Pell: \"Good.\" He goes offline. The flower turns toward her anyway. A flashlight bobbing up the slope. Mom: Kenny took Dad's lantern. The flower's center opens whether she logged it or not.",
+    choices: [{ label: "Lean toward the opening flower", next: "s3a", notice: "Pell believes the box is sealed… for now." }],
+  },
+  s1_cold: {
+    id: "s1_cold",
+    title: "Cold Case",
+    img: "s1",
+    narration:
+      "Amber seals the jar in the cold case. Silver veins brighten through the frost. Kenny goes up the ridge with the lantern. When she opens the case again, the center has opened — a curl of paper waits inside.",
+    choices: [{ label: "Take the note from the flower", next: "s3a" }],
+  },
+  s2: {
+    id: "s2",
+    title: "Did It Turn Toward You?",
+    img: "s2",
+    narration:
+      "\"It's already open.\" A long pause. Then: \"Did it turn toward you?\"\n\n\"Put it in the cold case. Don't touch the center. Don't take it outside. You're not the first I've sent one to. You're the first who answered.\" Offline.\n\nMusic cuts. Back door. Flashlight toward the ridge. Mom: Kenny heard someone calling his name.\n\nThe flower's center opens.",
+    hotspots: [
+      { id: "flower2", label: "Center", x: 38, y: 32, w: 28, h: 36, title: "Opening center", body: "Petals peel like slow fingers. Something folded waits where pollen should be." },
+      { id: "msg", label: "Messages", x: 62, y: 50, w: 24, h: 40, title: "Pell's warning", body: "\"You're the first one who answered.\"" },
+    ],
+    choices: [
+      { label: "Lean in to see what's inside the flower", next: "s3" },
+      { label: "Rush upstairs after Kenny first", next: "s2k" },
+      { label: "Reply to Pell: what is this flower?", next: "s2a" },
+    ],
+  },
+  s2k: {
+    id: "s2k",
+    title: "Too Late for the Stairs",
+    img: "s2",
+    narration:
+      "Two steps toward the stairs — the flower sighs. Silver dust. Walls breathe. From the mountain: \"Kenny…\" in Dad's voice. Mom is halfway down, eyes on the open flower. There is no leaving it now.",
+    choices: [{ label: "Face Mom and the open flower", next: "s3" }],
+  },
+  s2a: {
+    id: "s2a",
+    title: "No Answer",
+    img: "s2",
+    narration: "\"What did you send me?\" Delivered. Read. No reply. The center opens wider. Mom's footsteps hit the stairs.",
+    choices: [{ label: "Look inside before Mom reaches you", next: "s3" }],
+  },
+  s3: {
+    id: "s3",
+    title: "Dad's Note",
+    img: "s3",
+    narration:
+      "Amber leans in. Inside the bloom: a yellowed curl of paper. Dad's left-slanted pencil.\n\n\"Amber. Don't let them take the seeds. Follow the bloodroot to the cellar. — D.\"\n\nDad has been gone eleven years. Silver dust. From the mountain, Dad's voice calling Kenny.\n\nMom halfway down, gray-faced: \"Where did you get that?\"",
+    hotspots: [
+      { id: "note", label: "Note", x: 42, y: 46, w: 18, h: 18, title: "Note from D.", body: "\"Don't let them take the seeds. Follow the bloodroot to the cellar. — D.\"" },
+      { id: "angie", label: "Mom", x: 62, y: 6, w: 20, h: 52, title: "Angie", body: "She recognized the flower before the note." },
+    ],
+    choices: [
+      { label: "Hide the note and say it's nothing", next: "s4", notice: "Angie will remember that.", setFlags: { angieRememberLie: true } },
+      { label: "Show Mom the note", next: "s4s", notice: "Angie sees Dad's handwriting.", setFlags: { angieSawNote: true } },
+      { label: "Ask Mom what she knows about the ridge", next: "s3q" },
+    ],
+  },
+  s3a: {
+    id: "s3a",
+    title: "Dad's Note",
+    img: "s3",
+    narration:
+      "Petals peel back. Dad's note: \"Don't let them take the seeds. Follow the bloodroot to the cellar. — D.\" Mom on the stairs, face gray: \"Where did you get that?\"",
+    choices: [
+      { label: "Hide the note and say it's nothing", next: "s4", notice: "Angie will remember that.", setFlags: { angieRememberLie: true } },
+      { label: "Show Mom the note", next: "s4s", notice: "Angie sees Dad's handwriting.", setFlags: { angieSawNote: true } },
+    ],
+  },
+  s3q: {
+    id: "s3q",
+    title: "What Mom Knows",
+    img: "s3",
+    narration:
+      "\"What happened on that ridge?\" Angie: \"He said the flowers remembered. Verdance wanted the seeds. He told me he'd be back by morning.\" Coat. Keys. \"I'm going after Kenny. Stay with that thing — or burn it.\"",
+    choices: [{ label: "Let her go — check the new text", next: "s4", setFlags: { angieSawNote: true } }],
+  },
+  s4: {
+    id: "s4",
+    title: "The Car at the Driveway",
+    img: "s4",
+    narration:
+      "\"Packing filler. It's nothing, Mom.\" Angie: \"Your father used to say that. Right up until the night he walked up that ridge.\"\n\nCoat. Keys. A 434 text: \"Kenny is at the old well. Bring the flower. Come alone. Don't trust Pell.\"\n\nKoty in a hoodie: Mom's going up alone. A car at the driveway, lights off, twenty minutes. The flower turns toward the ridge.",
+    hotspots: [
+      { id: "text", label: "Text", x: 31, y: 12, w: 16, h: 18, title: "Unknown 434", body: "\"Bring the flower and come alone. Don't trust Pell.\"" },
+    ],
+    choices: [
+      { label: "Take the flower to the old well alone", next: "s5" },
+      { label: "Go with Koty", next: "s4k" },
+      { label: "Stop Mom and go together", next: "s4m" },
+      { label: "Stay and watch the dark car", next: "end_car" },
+    ],
+  },
+  s4s: {
+    id: "s4s",
+    title: "The Handwriting She Knows",
+    img: "s4",
+    narration:
+      "Amber holds out the slip. Angie reads it, eyes shining. \"Bloodroot. He made me memorize that word.\" Coat on. \"Bring the flower if you come. Don't give it to Verdance.\" The 434 text arrives. Dark car. Flower toward the ridge.",
+    choices: [
+      { label: "Take the flower to the old well alone", next: "s5", notice: "Angie asked you to keep the flower from Verdance." },
+      { label: "Go with Mom", next: "s4m" },
+    ],
+  },
+  s4k: {
+    id: "s4k",
+    title: "Koty Stays",
+    img: "s4",
+    narration: "\"Come with me.\" Koty shakes her head. \"Someone has to watch the house and that car. Text me. Bring Kenny home.\"",
+    choices: [{ label: "Slip out the basement door alone", next: "s5" }],
+  },
+  s4m: {
+    id: "s4m",
+    title: "Mom Won't Wait",
+    img: "s4",
+    narration: "\"We go together.\" Angie eyes the jar. \"If we both follow it, who brings Kenny back?\" She pushes into the rain. The 434 text buzzes again: come alone.",
+    choices: [
+      { label: "Follow the bloodroot trail alone anyway", next: "s5" },
+      { label: "Chase Mom without the flower", next: "end_nf" },
+    ],
+  },
+  end_car: {
+    id: "end_car",
+    title: "Watching",
+    img: "s4",
+    ending: true,
+    narration: "Amber watches the dark car. A second set of headlights. Verdance jackets start up the driveway. On the ridge, the lantern goes out. Kenny does not come home tonight.\n\n— Short ending —",
+    epilogue: "You stayed. The ridge took Kenny. Restart to choose differently.",
+    choices: [{ label: "Restart Episode 1", next: "title" }],
+  },
+  end_nf: {
+    id: "end_nf",
+    title: "Without the Key",
+    img: "s5",
+    ending: true,
+    narration: "Without the jar, Ruth's smile dies at the well. \"Without the bloom, that door stays shut.\" Pell's headlights hit the clearing.\n\n— Short ending —",
+    epilogue: "The flower was the key. Restart to bring it.",
+    choices: [{ label: "Restart Episode 1", next: "title" }],
+  },
+  s5: {
+    id: "s5",
+    title: "The Old Well",
+    img: "s5",
+    narration:
+      "Jar warm inside Amber's green jacket. Bloodroot glows in November — a trail uphill. Mist. A car door shuts below.\n\nOld well. Cover pried off. Dad's lantern lit. From inside: \"Amber? Don't come closer. She's here.\"\n\nFrom the fog: gray braid, waxed coat, burn scar, garden trowel. \"Danny's girl. Give me the bloom before Pell's people get up this hill.\"",
+    hotspots: [
+      { id: "well", label: "Well", x: 40, y: 20, w: 28, h: 42, title: "Old well", body: "Kenny's voice rises from the dark. Dad's lantern still burns." },
+      { id: "ruth", label: "Ruth", x: 70, y: 6, w: 28, h: 78, title: "Stranger", body: "Gray braid. Waxed coat. Burn scar. She knows Danny's name." },
+    ],
+    choices: [
+      { label: "Ask how she knew your father", next: "s6" },
+      { label: "Demand Kenny comes up first", next: "s5k" },
+      { label: "Hand her the flower", next: "end_give" },
+      { label: "Run back toward the house", next: "end_run" },
+    ],
+  },
+  s5k: {
+    id: "s5k",
+    title: "Kenny First",
+    img: "s5",
+    narration: "Kenny climbs out muddy. \"There's a door down there. Dad's initials.\" Headlights in the trees. Ruth: \"Now ask your question. Fast.\"",
+    choices: [{ label: "Ask how she knew Dad", next: "s6", setFlags: { kennySafe: true } }],
+  },
+  end_give: {
+    id: "end_give",
+    title: "The Bloom Changes Hands",
+    img: "s5",
+    ending: true,
+    narration: "Ruth takes the jar and vanishes into fog. Without the bloom the door stays shut. Pell's headlights arrive.\n\n— Short ending —",
+    epilogue: "You gave away the key. Restart to keep it.",
+    choices: [{ label: "Restart Episode 1", next: "title" }],
+  },
+  end_run: {
+    id: "end_run",
+    title: "Back Down the Hill",
+    img: "s5",
+    ending: true,
+    narration: "Amber runs. Ruth, mild as rain: \"Then Pell gets him, honey.\" Verdance jackets already on the logging road.\n\n— Short ending —",
+    epilogue: "You ran. Restart to stand your ground.",
+    choices: [{ label: "Restart Episode 1", next: "title" }],
+  },
+  s6: {
+    id: "s6",
+    title: "Hollins Ridge",
+    img: "s6",
+    narration:
+      "\"I'm Ruth Hollins. Your daddy worked Verdance — same flowers in the mail. Hollins Ridge grew flowers that remember. Danny hid the seeds. The night he went up, he was keeping a promise.\"\n\nKenny: \"She's not lying. Dad's initials are on a door down here.\"\n\nTwo sets of headlights on the logging road. \"That bloom is the key. Pell thinks you'll open it so his people take everything. Trust me — we go down together. Quick.\"",
+    choices: [
+      { label: "Trust Ruth — climb down together", next: "s7", notice: "Ruth trusts you.", setFlags: { ruthTrusts: true, kennySafe: true } },
+      { label: "Climb alone — Ruth stays lookout", next: "s7a", setFlags: { kennySafe: true } },
+      { label: "Wait and face Pell at the well", next: "end_wp" },
+    ],
+  },
+  end_wp: {
+    id: "end_wp",
+    title: "Pell Arrives First",
+    img: "s6",
+    ending: true,
+    narration: "Ruth melts into the trees. Pell, tired not angry: \"Give me the bloom. Your father locked something that should stay locked.\" You never see the door open.\n\n— Short ending —",
+    epilogue: "You waited. Restart to go down.",
+    choices: [{ label: "Restart Episode 1", next: "title" }],
+  },
+  s7: {
+    id: "s7",
+    title: "D.R. 2015",
+    img: "s7",
+    narration:
+      "Iron rungs. Stone passage. Kenny muddy and cold. Oak door banded with iron: D.R. 2015, hollow shaped like five petals. The jar goes hot.\n\nPell down the shaft: \"Stop before you open that door. You don't know what your father locked in there.\"\n\nRuth: \"He's lying. Open it.\" Kenny: \"What if he isn't?\" Silver veins light the tunnel.",
+    hotspots: [
+      { id: "door", label: "Door", x: 1, y: 4, w: 27, h: 92, title: "D.R. 2015", body: "Old oak, iron bands. A hollow shaped exactly like the bloom." },
+      { id: "key", label: "Flower", x: 37, y: 46, w: 16, h: 20, title: "The key", body: "It fits the hollow. It wants to." },
+    ],
+    choices: [
+      { label: "Press the flower into the door", next: "s8" },
+      { label: "Trust Pell — leave the door shut", next: "end_tp" },
+      { label: "Let Ruth press the flower in", next: "s8", notice: "Ruth opens Dad's door.", setFlags: { gaveFlowerToRuth: true } },
+    ],
+  },
+  s7a: {
+    id: "s7a",
+    title: "Down Alone",
+    img: "s7",
+    narration: "Amber climbs alone. The D.R. 2015 door waits. Pell's voice drifts down. Without Ruth's whisper, Kenny's doubt is louder.",
+    choices: [
+      { label: "Press the flower into the door", next: "s8" },
+      { label: "Trust Pell — climb back up", next: "end_tp" },
+    ],
+  },
+  end_tp: {
+    id: "end_tp",
+    title: "The Door Stays Shut",
+    img: "s7",
+    ending: true,
+    narration: "Amber pulls the jar away. Pell's relief is almost tender. The bloom goes into a sealed case. Ruth is gone. \"One day I'll tell you what woke up the last time it opened.\" He never does. Not in Episode 1.\n\n— Short ending —",
+    epilogue: "You trusted Pell. Restart to open the door.",
+    choices: [{ label: "Restart Episode 1", next: "title" }],
+  },
+  s8: {
+    id: "s8",
+    title: "They're All Awake Now",
+    img: "s8",
+    ending: true,
+    narration:
+      "The flower fits the hollow. Silver veins pour into the wood. D.R. blazes white. The door swings on warm air that smells like spring.\n\nAn underground greenhouse. Grow lamps. Seed jars in Dad's hand. Hundreds of bruise-purple flowers turning toward Amber. A camcorder: Tape #3. \"Amber, press play.\"\n\nRuth exhales eleven years. Kenny: \"Dad built this?\"\n\nBoots on stone. Pell — rain on his glasses — looks at the garden. Not greedy. Terrified.\n\n\"Oh no. Amber, they're all awake now.\"\n\n— End of Episode 1 —",
+    epilogue: "Canon close: Ruth trusts you. Angie's memory stands. Kenny is safe, for now. Episode 2 begins when Amber presses play.",
+    choices: [{ label: "Play again from the title", next: "title" }],
+  },
+};
+
+const CANON = "Canon path: tell Pell the truth → lean into the flower → hide the note → go to the well alone → ask Ruth about Dad → climb down together → press the flower into the door.";
+
+const $ = (id) => document.getElementById(id);
+let sceneId = "title";
+let flags = { ...START_FLAGS };
+let notice = null;
+let inspect = null;
+
+function restart() {
+  flags = { ...START_FLAGS };
+  notice = null;
+  inspect = null;
+  sceneId = "title";
+  render(true);
+}
+
+function go(choice) {
+  if (choice.next === "title") { restart(); return; }
+  if (choice.setFlags) flags = { ...flags, ...choice.setFlags };
+  notice = choice.notice || null;
+  inspect = null;
+  sceneId = choice.next;
+  render(true);
+}
+
+function scene() {
+  return SCENES[sceneId] || SCENES.title;
+}
+
+function render(sceneChanged) {
+  const s = scene();
+  const onTitle = s.id === "title";
+  document.title = onTitle ? "Bloodroot — Episode 1" : s.title + " — Bloodroot";
+  document.querySelector(".shell").classList.toggle("is-title", onTitle);
+  $("title").textContent = onTitle ? "Bloodroot" : s.title;
+  $("sub").textContent = onTitle
+    ? "Episode 1 — The Late Shipment"
+    : "Selectable choices · click the outlined places";
+  $("restart").hidden = onTitle;
+
+  const flagBox = $("flags");
+  flagBox.replaceChildren();
+  for (const [key, label] of FLAG_LABELS) {
+    if (!flags[key]) continue;
+    const chip = document.createElement("span");
+    chip.className = "flag";
+    chip.textContent = label;
+    flagBox.appendChild(chip);
+  }
+
+  const note = $("notice");
+  note.hidden = !notice;
+  note.replaceChildren();
+  if (notice) {
+    const k = document.createElement("b");
+    k.textContent = "Relationship";
+    const t = document.createElement("span");
+    t.textContent = notice;
+    note.append(k, t);
+  }
+
+  renderStage(s);
+  renderInspect();
+  if (sceneChanged || $("narration").textContent === "") $("narration").textContent = s.narration;
+
+  const epi = $("epilogue");
+  epi.replaceChildren();
+  epi.className = "";
+  if (s.ending && s.epilogue) {
+    epi.className = "epilogue " + (s.id === "s8" ? "complete" : "short");
+    const k = document.createElement("b");
+    k.textContent = s.id === "s8" ? "Episode complete" : "Ending";
+    const t = document.createElement("span");
+    t.textContent = s.epilogue;
+    epi.append(k, t);
+  }
+
+  const box = $("choices");
+  box.replaceChildren();
+  if (!onTitle && s.choices) {
+    const prompt = document.createElement("p");
+    prompt.className = "prompt";
+    prompt.textContent = "What does Amber do?";
+    box.appendChild(prompt);
+  }
+  (s.choices || []).forEach((choice, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "choice" + (i === 0 ? " lead" : "");
+    const n = document.createElement("span");
+    n.className = "n";
+    n.textContent = String(i + 1);
+    const label = document.createElement("span");
+    label.textContent = choice.label;
+    b.append(n, label);
+    b.addEventListener("click", () => go(choice));
+    box.appendChild(b);
+  });
+
+  $("foot").textContent = onTitle ? CANON : "";
+
+  if (sceneChanged) {
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }
+}
+
+function renderStage(s) {
+  const stage = $("stage");
+  stage.replaceChildren();
+  const key = s.id === "title" ? "s8" : s.img;
+  if (!key || !IMGS[key]) return;
+  const frame = document.createElement("div");
+  frame.className = "frame";
+  const img = document.createElement("img");
+  img.src = IMGS[key];
+  img.width = 1280;
+  img.height = 720;
+  img.alt = s.id === "title"
+    ? "Underground greenhouse at the end of Episode 1, purple flowers turning toward an open door marked D.R."
+    : s.title;
+  img.addEventListener("error", () => {
+    const p = document.createElement("p");
+    p.className = "missing";
+    p.textContent = img.alt + " (scene art missing)";
+    img.replaceWith(p);
+  });
+  frame.appendChild(img);
+  const shade = document.createElement("div");
+  shade.className = "vignette";
+  frame.appendChild(shade);
+
+  if (s.id === "title") {
+    const copy = document.createElement("div");
+    copy.className = "hero-copy";
+    copy.innerHTML = '<p class="eyebrow">Hollins Ridge, near Lynchburg</p><h2>Bloodroot</h2><p class="episode">Episode 1 <span>— The Late Shipment</span></p>';
+    frame.appendChild(copy);
+    stage.appendChild(frame);
+    const cap = document.createElement("p");
+    cap.className = "caption";
+    cap.textContent = "Canon path ends at Dad's underground greenhouse.";
+    stage.appendChild(cap);
+    return;
+  }
+
+  (s.hotspots || []).forEach((h) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "hot";
+    b.style.left = h.x + "%";
+    b.style.top = h.y + "%";
+    b.style.width = h.w + "%";
+    b.style.height = h.h + "%";
+    b.title = h.label;
+    b.setAttribute("aria-label", "Inspect " + h.label);
+    b.setAttribute("aria-pressed", inspect && inspect.id === h.id ? "true" : "false");
+    const tag = document.createElement("span");
+    tag.className = "tag";
+    tag.textContent = h.label;
+    b.appendChild(tag);
+    b.addEventListener("click", () => {
+      inspect = inspect && inspect.id === h.id ? null : h;
+      render(false);
+    });
+    frame.appendChild(b);
+  });
+  stage.appendChild(frame);
+}
+
+function renderInspect() {
+  const slot = $("inspect");
+  slot.replaceChildren();
+  if (!inspect) return;
+  const card = document.createElement("div");
+  card.className = "inspect";
+  const k = document.createElement("p");
+  k.className = "kicker";
+  k.textContent = "Looking closer";
+  const h = document.createElement("h2");
+  h.textContent = inspect.title;
+  const p = document.createElement("p");
+  p.textContent = inspect.body;
+  const close = document.createElement("button");
+  close.type = "button";
+  close.textContent = "Close";
+  close.addEventListener("click", () => { inspect = null; render(false); });
+  card.append(k, h, p, close);
+  slot.appendChild(card);
+}
+
+$("restart").addEventListener("click", restart);
+document.addEventListener("keydown", (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === "Escape" && inspect) { inspect = null; render(false); return; }
+  const n = Number(e.key);
+  const choices = scene().choices || [];
+  if (n >= 1 && n <= choices.length) go(choices[n - 1]);
+});
+
+render(false);
+</script>
+</body>
+</html>
